@@ -63,6 +63,7 @@ function reset_player_objects()
 
   P1.gauge_addr = 0x020695B5
   P1.meter_addr = { 0x020286AB, 0x020695BF } -- 2nd address is the master variable
+  P1.stun_status = 0x020695F4
   P1.stun_max_addr = 0x020695F7
   P1.stun_timer_addr = P1.stun_max_addr + 0x2
   P1.stun_bar_addr = P1.stun_max_addr + 0x6
@@ -87,9 +88,14 @@ function reset_player_objects()
   P1.charge_4_addr = 0x020259F5
   P1.charge_5_reset_addr = 0x020259D7 -- Oro_2(Yanma), Urien_1(tackle), Chun_4, Q_1(DashHead), Remy_3(Rising)
   P1.charge_5_addr = 0x020259D9
+  P1.charge_6_reset_addr = 0x020259f3 -- [ashtanga] Chun_hyaku
+  P1.hyaku_addr0  = 0x02025A03 -- [ashtanga] Chun_hyaku
+  P1.hyaku_addr1  = 0x02025A05 -- [ashtanga] Chun_hyaku
+  P1.hyaku_addr2  = 0x02025A07 -- [ashtanga] Chun_hyaku
 
   P2.gauge_addr = 0x020695E1
   P2.meter_addr = { 0x020286DF, 0x020695EB} -- 2nd address is the master variable
+  P2.stun_status = 0x02069608
   P2.stun_max_addr = 0x0206960B
   P2.stun_timer_addr = P2.stun_max_addr + 0x2
   P2.stun_bar_addr = P2.stun_max_addr + 0x6
@@ -114,6 +120,11 @@ function reset_player_objects()
   P2.charge_4_addr = 0x0202604D
   P2.charge_5_reset_addr = 0x02026067
   P2.charge_5_addr = 0x02026069
+  P2.charge_6_reset_addr = 0x02026013 -- [ashtanga] Chun_hyaku
+  P2.hyaku_addr0  = 0x02025A03 + 0x620 -- [ashtanga] Chun_hyaku
+  P2.hyaku_addr1  = 0x02025A05 + 0x620 -- [ashtanga] Chun_hyaku
+  P2.hyaku_addr2  = 0x02025A07 + 0x620 -- [ashtanga] Chun_hyaku
+
 end
 
 
