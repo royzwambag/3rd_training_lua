@@ -15,49 +15,49 @@ print("- In normal mode, press \"Coin\" to start/stop replay")
 print("- Lua Hotkey 1 (alt+1) to return to character select screen")
 print("")
 
--- ��2021.11.22
---   - �����^�C�~���O: ��u����̃J�E���^�[�^�C�~���O��ύX
---   - �q�b�g�X�g�b�v�t���[���A�񕜃t���[����\��
---   - �L�����̒��S���v���X�ŕ\��
--- ��2021.11.24
---   - �̐����Ⴄ�U���̓K�[�h���Ȃ����[�h�ǉ�
+-- ■2021.11.22
+--   - 反撃タイミング: 空ブロ後のカウンタータイミングを変更
+--   - ヒットストップフレーム、回復フレームを表示
+--   - キャラの中心をプラスで表示
+-- ■2021.11.24
+--   - 体勢が違う攻撃はガードしないモード追加
 --     Dummy -> Blocking Style -> block_A
--- ��2021.11.25
---   - ���v���C���ɍ��E�������]���s��Ȃ�(disable_replay_flip)�ǉ�
+-- ■2021.11.25
+--   - リプレイ時に左右自動反転を行わない(disable_replay_flip)追加
 --     Misc -> Enable replay flip
--- ��2021.11.27
---   - Replay,Recording�{�^����P2.start�Ɋ����Ă�
--- ��2021.11.27
---   - crouching���ɋ����I�Ƀj���[�g�����ɂ���QS������悤�ɏC��
--- ��2022.01.31
---   - �t��̕S��^�C�}�[�\�����[�h�ǉ�
+-- ■2021.11.27
+--   - Replay,RecordingボタンをP2.startに割当てた
+-- ■2021.11.27
+--   - crouching時に強制的にニュートラルにしてQSを取れるように修正
+-- ■2022.01.31
+--   - 春麗の百裂タイマー表示モード追加
 --     Misc -> Display Special meter
--- ��2022.05.01
---   - ���C�t�\�����_���[�W�̒l�ɕύX
---   - �X�^���񕜃��[�^�[�ǉ�
---   - �팸�l�E�󒆃R���{�^�C�}�[�\��
---   - ���������\��
--- ��2022.05.04
---   - ���C�t�ݒ�l���j���[�ǉ�
---   - �R���{�_���[�W�\��
--- ��2022.05.22
---   - v0.10 ����荞��
---     �g�[�^���_���[�W�\���@�\���ǉ����ꂽ�̂ŁAAshtanga�ł̓��@�\�͍폜
---   - �܂��Ƃ̏�K�ړ������̋�����\��
---   - ���Ԃ��̒�K,�ߑ�K�ړ������̋�����\��
--- ��2022.06.01
---   - Misc -> Display Cancel Timing �ǉ�
---   - Misc -> Cancel Mode1,2 �ǉ�
--- ��2022.08.24
+-- ■2022.05.01
+--   - ライフ表示をダメージの値に変更
+--   - スタン回復メーター追加
+--   - 削減値・空中コンボタイマー表示
+--   - 投げ距離表示
+-- ■2022.05.04
+--   - ライフ設定値メニュー追加
+--   - コンボダメージ表示
+-- ■2022.05.22
+--   - v0.10 を取り込んだ
+--     トータルダメージ表示機能が追加されたので、Ashtanga版の同機能は削除
+--   - まことの小K移動唐草の距離を表示
+--   - いぶきの中K,近大K移動投げの距離を表示
+-- ■2022.06.01
+--   - Misc -> Display Cancel Timing 追加
+--   - Misc -> Cancel Mode1,2 追加
+-- ■2022.08.24
 --   - add enable_distance_replay, replay_start_distance
---   - �w�苗���܂ŋ߂Â��ƃ��v���C���J�n���郂�[�h��ǉ�
---   - Misc -> Disctance Replay Mode �ŗL��/�����I��
---   - Misc -> Replay start distance �ŋ�����ݒ�
--- ��2022.08.29
+--   - 指定距離まで近づくとリプレイを開始するモードを追加
+--   - Misc -> Disctance Replay Mode で有効/無効選択
+--   - Misc -> Replay start distance で距離を設定
+-- ■2022.08.29
 --   - add replay_start_height
---   - �w�荂���܂ŉ��~����ƃ��v���C���J�n���郂�[�h��ǉ�
---   - Misc -> Height Replay Mode  �ŗL��/�����I��
---   - Misc -> Replay start height �ŋ�����ݒ�
+--   - 指定高さまで下降するとリプレイを開始するモードを追加
+--   - Misc -> Height Replay Mode  で有効/無効選択
+--   - Misc -> Replay start height で距離を設定
 
 -- Kudos to indirect contributors:
 -- *esn3s* for his work on 3s frame data : http://baston.esn3s.com/
@@ -1223,7 +1223,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
       _animation_frame_delta = _dummy.blocking.expected_attack_animation_hit_frame - _player_relevant_animation_frame
     end
 
-    -- �K�[�h
+    -- ガード
     if _blocking_style == 1 or _blocking_style == 4 then
       local _blocking_delta_threshold = 2
       if _dummy.blocking.is_precise_timing then
@@ -1243,7 +1243,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
           _input[_dummy.prefix..' Left'] = true
         end
 
-        -- �̐��ƈႤ�������K�[�h����
+        -- 体勢と違う属性もガードする
         if _blocking_style == 1 then
           if _hit_type == 2 then
             _input[_dummy.prefix..' Down'] = true
@@ -1252,7 +1252,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
           end
         end
       end
-    -- �u���b�L���O
+    -- ブロッキング
     elseif _blocking_style == 2 then
       _input[_dummy.prefix..' Right'] = false
       _input[_dummy.prefix..' Left'] = false
@@ -1286,7 +1286,7 @@ end
 function update_fast_wake_up(_input, _player, _dummy, _mode)
   if is_in_match and _mode ~= 1 and current_recording_state ~= 4 then
     --local _should_tap_down = _dummy.previous_can_fast_wakeup == 0 and _dummy.can_fast_wakeup == 1
-    -- ��QS���ɋ����I�Ƀj���[�g����������
+    -- ■QS時に強制的にニュートラルを入れる
     local _should_tap_neutral = _dummy.previous_can_fast_wakeup  == 0 and _dummy.can_fast_wakeup == 1
     local _should_tap_down    = _dummy.previous_can_fast_wakeup2 == 0 and _dummy.previous_can_fast_wakeup == 1
 
@@ -1344,7 +1344,7 @@ function update_counter_attack(_input, _attacker, _defender, _stick, _button)
       print(frame_number.." - init ca (parry)")
     end
     log(_defender.prefix, "counter_attack", "init ca (parry)")
-    -- �������^�C�~���O
+    -- ■反撃タイミング
     if _defender.pos_y > 0 then
       _defender.counter.attack_frame = frame_number + 19
     else
@@ -1699,7 +1699,7 @@ end
 p2_stun_reset_value_gauge_item.is_disabled = p1_stun_reset_value_gauge_item.is_disabled
 stun_reset_delay_item.is_disabled = p1_stun_reset_value_gauge_item.is_disabled
 
--- ��add ashtanga
+-- ■add ashtanga
 distance_replay_item = integer_menu_item("  Replay start distance", training_settings, "replay_start_distance", 1, 200, false, 100)
 distance_replay_item.is_disabled = function()
   return training_settings.enable_distance_replay ~= true
@@ -2401,7 +2401,7 @@ function before_frame()
   -- counter attack
   update_counter_attack(_input, player, dummy, training_settings.counter_attack_stick, training_settings.counter_attack_button)
 
-  -- ������Playing�J�n add ashtanga
+  -- 距離でPlaying開始 add ashtanga
   if training_settings.enable_distance_replay == true and is_in_match then
     distance_char_old = distance_char
     distance_char     = math.abs(player_objects[1].pos_x - player_objects[2].pos_x)
@@ -2524,8 +2524,8 @@ function before_frame()
 
   -- add ashtanga
   if((training_settings.cancel_mode1 ~= 1) or (training_settings.cancel_mode2 ~= 1)) then
-    memory.writebyte(0x02068E8D, (training_settings.cancel_mode1 - 1) + (training_settings.cancel_mode2 - 1) * 0x20) -- 1P �F�X�L�����Z��
-    memory.writebyte(0x02069325, (training_settings.cancel_mode1 - 1) + (training_settings.cancel_mode2 - 1) * 0x20) -- 2P �F�X�L�����Z��
+    memory.writebyte(0x02068E8D, (training_settings.cancel_mode1 - 1) + (training_settings.cancel_mode2 - 1) * 0x20) -- 1P 色々キャンセル
+    memory.writebyte(0x02069325, (training_settings.cancel_mode1 - 1) + (training_settings.cancel_mode2 - 1) * 0x20) -- 2P 色々キャンセル
   end
 
   log_update()
@@ -2553,7 +2553,7 @@ function on_gui()
     display_draw_printed_geometry()
 
 
-    -- �R���{�_���[�W�ʌv�Z
+    -- コンボダメージ量計算
     local _damage_freeze_cnt_p1_zero_edge = false
     local _damage_freeze_cnt_p2_zero_edge = false
     if((damage_freeze_cnt_p1 ~= 0) and (memory.readbyte(0x02068DF3) == 0)) then
@@ -2562,7 +2562,7 @@ function on_gui()
     if((damage_freeze_cnt_p2 ~= 0) and (memory.readbyte(0x0206928B) == 0)) then
       _damage_freeze_cnt_p2_zero_edge = true
     end
-    -- �R���{��0 �܂��� �̂�����J�E���^��0�ƂȂ����Ƃ��ɏ�����
+    -- コンボが0 または のけぞりカウンタが0となったときに初期化
     if((_damage_freeze_cnt_p1_zero_edge == true) or (memory.readbyte(0x0206961D) == 0)) then
       player_objects[1].combo_start_life = player_objects[1].life
     elseif(memory.readbyte(0x0206961D) >= 1) then
@@ -2984,7 +2984,7 @@ function on_gui()
     menu_stack_clear()
   end
 
-  -- ���ǉ��\���p�̊֐�
+  -- ■追加表示用の関数
   function disp_special(_player, _x, _y)
     local _y_offset = 0
 
@@ -3013,7 +3013,7 @@ function on_gui()
     local _gauge_background_color = 0xD6E7EF77
     local _gauge_cooldown_fill_color = 0xFF9939FF
 
-    -- �t��
+    -- 春麗
     if _player.char_str == "chunli" then
       for i = 1, memory.readbyte(hyaku_addr0), 1 do
         gui.image(_x + (i-1)*10, _y +  0 + _y_offset, img_LK_button_small)
@@ -3027,7 +3027,7 @@ function on_gui()
       --draw_gauge(_x,       _y + _y_offset + 20, 98, 3, memory.readbyte(hyaku_time)/98, _gauge_cooldown_fill_color, _gauge_background_color, nil, true)
       draw_gauge(_x,       _y + _y_offset + 20, 98, 3, memory.readbyte(hyaku_time)/98, _gauge_cooldown_fill_color, _gauge_background_color, nil, true)
       gui.text  (_x + 103, _y + _y_offset + 20, string.format("%d", memory.readbyte(hyaku_time),  0x00C080FF, 0x000000FF))
-    -- �����E���d�n
+    -- リュウ＆電刃
     elseif((_player.char_str == "ryu") and (memory.readbyte(super_art) == 2))then
       --  3  8..0
       --  9 24..1
@@ -3056,7 +3056,7 @@ function on_gui()
       gui.box   (_x - 2 + 81, yb -  3, _x + 81, yb + 3, 0xFFFFFFFF, 0x00000000)
       gui.text  (_x,          yb +  7, string.format("%d", _tame,  0x00C080FF, 0x000000FF))
       --gui.text  (_x,          yb + 17, string.format("%d", _phase, 0x00C080FF, 0x000000FF))
-    -- �܂���
+    -- まこと
     elseif(_player.char_str == "makoto") then
       local _tame
       local _level
@@ -3090,20 +3090,20 @@ function on_gui()
 
   if is_in_match == true then
     ------------------------
-    -- ���W
+    -- 座標
     ------------------------
-    -- �X�e�[�W�S�̂ł̍��W���擾
+    -- ステージ全体での座標を取得
     local P1_pos_x = memory.readword(0x02068CD0)
     local P1_pos_y = memory.readword(0x02068CD4)
     local P2_pos_x = memory.readword(0x02069168)
     local P2_pos_y = memory.readword(0x0206916C)
   
-    -- ��ʏ�̑��ΓI�Ȉʒu�̍��W���擾
+    -- 画面上の相対的な位置の座標を取得
     local P1_px, P1_py = game_to_screen_space(P1_pos_x, P1_pos_y)
     local P2_px, P2_py = game_to_screen_space(P2_pos_x, P2_pos_y)
 
-    -- ���X�y�V�����Q�[�W�̕\��
-    -- CPS3 384�~224
+    -- ■スペシャルゲージの表示
+    -- CPS3 384×224
     if  training_settings.enable_special_meter == true then
       if(P1.char_str == "ryu") then
         disp_special(P1,  26, 58)
@@ -3118,7 +3118,7 @@ function on_gui()
       end
     end
 
-    -- �X�^���񕜃��[�^�[�\��
+    -- スタン回復メーター表示
     if training_settings.enable_stun_meter == true then
       p1_stun_state = memory.readbyte(P1.stun_status)
       p2_stun_state = memory.readbyte(P2.stun_status)
@@ -3151,7 +3151,7 @@ function on_gui()
       p2_stun_state_cur = p2_stun_state
     end
   
-    -- �팸�l�\��
+    -- 削減値表示
     if training_settings.enable_aircombo_meter == true then
       local _x = 133
       local _y = 44
@@ -3175,124 +3175,124 @@ function on_gui()
       draw_vertical_line(_x+(121-  2), _y-2, _y+2, 0xFFFFFF80, 1)
     end
 
-    -- �ړ�����(��L�����Z������)
+    -- 移動投げ(空キャンセル投げ)
     function disp_throw_distance(_p1, _p2)
       local _throw = {}
       if    (_p1.char_str == "gill") then
-        _throw[ #_throw + 1 ]  = 28      -- gill:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 28      -- gill:通常投げ
       elseif(_p1.char_str == "alex") then
-        _throw[ #_throw + 1 ]  = 30      -- alex:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 30      -- alex:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 30 + 16 -- alex:6��P
+        _throw[ #_throw + 1 ]  = 30 + 16 -- alex:6大P
       elseif(_p1.char_str == "ryu") then
-        _throw[ #_throw + 1 ]  = 24      -- ryu:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 24      -- ryu:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 24 + 16 -- ryu:6��P
+        _throw[ #_throw + 1 ]  = 24 + 16 -- ryu:6中P
       elseif(_p1.char_str == "yun") then
-        _throw[ #_throw + 1 ]  = 18      -- yun:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 18      -- yun:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 31      -- yun:�O���]�g
+        _throw[ #_throw + 1 ]  = 31      -- yun:前方転身
       elseif(_p1.char_str == "dudley") then
-        _throw[ #_throw + 1 ]  = 20      -- dudley:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 20      -- dudley:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 20 + 10 -- dudley:6��P
-        _throw[ #_throw + 1 ]  = 20 + 11 -- dudley:6��K
-        _throw[ #_throw + 1 ]  = 20 + 12 -- dudley:6��P
+        _throw[ #_throw + 1 ]  = 20 + 10 -- dudley:6中P
+        _throw[ #_throw + 1 ]  = 20 + 11 -- dudley:6大K
+        _throw[ #_throw + 1 ]  = 20 + 12 -- dudley:6小P
       elseif(_p1.char_str == "necro") then
-        _throw[ #_throw + 1 ]  = 26      -- necro:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 26      -- necro:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 26 + 8  -- necro:4��K
+        _throw[ #_throw + 1 ]  = 26 + 8  -- necro:4大K
       elseif(_p1.char_str == "hugo") then
-        _throw[ #_throw + 1 ]  = 32      -- hugo:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 32      -- hugo:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 59      -- hugo:�����[��
-        _throw[ #_throw + 1 ]  = 53      -- hugo:�����[��
-        _throw[ #_throw + 1 ]  = 47      -- hugo:�僀�[��
+        _throw[ #_throw + 1 ]  = 59      -- hugo:小ムーン
+        _throw[ #_throw + 1 ]  = 53      -- hugo:中ムーン
+        _throw[ #_throw + 1 ]  = 47      -- hugo:大ムーン
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 70      -- hugo:�M�K�X
+        _throw[ #_throw + 1 ]  = 70      -- hugo:ギガス
       elseif(_p1.char_str == "ibuki") then
-        _throw[ #_throw + 1 ]  = 16      -- ibuki:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 16      -- ibuki:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 16 + 4  -- ibuki:��K�E�ߑ�K
+        _throw[ #_throw + 1 ]  = 16 + 4  -- ibuki:中K・近大K
       elseif(_p1.char_str == "elena") then
-        _throw[ #_throw + 1 ]  = 22      -- elena:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 22      -- elena:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 22 + 28 -- elena:6��K
+        _throw[ #_throw + 1 ]  = 22 + 28 -- elena:6中K
       elseif(_p1.char_str == "oro") then
-        _throw[ #_throw + 1 ]  = 25      -- oro:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 25      -- oro:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 25 + 12 -- oro:6��P
-        _throw[ #_throw + 1 ]  = 25 + 14 -- oro:��K
-        _throw[ #_throw + 1 ]  = 25 + 28 -- oro:����K
+        _throw[ #_throw + 1 ]  = 25 + 12 -- oro:6中P
+        _throw[ #_throw + 1 ]  = 25 + 14 -- oro:大K
+        _throw[ #_throw + 1 ]  = 25 + 28 -- oro:遠中K
       elseif(_p1.char_str == "yang") then
-        _throw[ #_throw + 1 ]  = 18      -- yang:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 18      -- yang:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 18 + 13 -- yang:��K
+        _throw[ #_throw + 1 ]  = 18 + 13 -- yang:大K
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 31      -- yang:�O���]�g
+        _throw[ #_throw + 1 ]  = 31      -- yang:前方転身
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 31 + 13 -- yang:��K + �O���]�g
+        _throw[ #_throw + 1 ]  = 31 + 13 -- yang:大K + 前方転身
       elseif(_p1.char_str == "ken") then
-        _throw[ #_throw + 1 ]  = 24      -- ken:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 24      -- ken:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 24 + 10 -- ken:4��K
-        _throw[ #_throw + 1 ]  = 24 + 13 -- ken:����K�A����K
+        _throw[ #_throw + 1 ]  = 24 + 10 -- ken:4中K
+        _throw[ #_throw + 1 ]  = 24 + 13 -- ken:屈中K、屈大K
       elseif(_p1.char_str == "sean") then
-        _throw[ #_throw + 1 ]  = 20      -- sean:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 20      -- sean:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 20 + 14 -- sean:6��P
+        _throw[ #_throw + 1 ]  = 20 + 14 -- sean:6大P
       elseif(_p1.char_str == "urien") then
-        _throw[ #_throw + 1 ]  = 26      -- urien:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 26      -- urien:通常投げ
       elseif(_p1.char_str == "gouki") then
-        _throw[ #_throw + 1 ]  = 24      -- gouki:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 24      -- gouki:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 24 + 20 -- gouki:6��P
+        _throw[ #_throw + 1 ]  = 24 + 20 -- gouki:6中P
       elseif(_p1.char_str == "chunli") then
-        _throw[ #_throw + 1 ]  = 26      -- chunli:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 26      -- chunli:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 26 + 16 -- chunli:�ߑ�K
-        _throw[ #_throw + 1 ]  = 26 + 32 -- chunli:����K
+        _throw[ #_throw + 1 ]  = 26 + 16 -- chunli:近大K
+        _throw[ #_throw + 1 ]  = 26 + 32 -- chunli:遠中K
       elseif(_p1.char_str == "makoto") then
-        _throw[ #_throw + 1 ]  = 20      -- makoto:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 20      -- makoto:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 20 + 13 -- makoto:����K
+        _throw[ #_throw + 1 ]  = 20 + 13 -- makoto:屈大K
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 39      -- makoto:������
-        _throw[ #_throw + 1 ]  = 43      -- makoto:������
-        _throw[ #_throw + 1 ]  = 47      -- makoto:�哂��
+        _throw[ #_throw + 1 ]  = 39      -- makoto:小唐草
+        _throw[ #_throw + 1 ]  = 43      -- makoto:中唐草
+        _throw[ #_throw + 1 ]  = 47      -- makoto:大唐草
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 39 + 13 -- makoto:����K + ������
-        _throw[ #_throw + 1 ]  = 43 + 13 -- makoto:����K + ������
-        _throw[ #_throw + 1 ]  = 47 + 13 -- makoto:����K + �哂��
+        _throw[ #_throw + 1 ]  = 39 + 13 -- makoto:屈大K + 小唐草
+        _throw[ #_throw + 1 ]  = 43 + 13 -- makoto:屈大K + 中唐草
+        _throw[ #_throw + 1 ]  = 47 + 13 -- makoto:屈大K + 大唐草
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 39 + 41 -- makoto:������K + ������
-        _throw[ #_throw + 1 ]  = 43 + 41 -- makoto:������K + ������
-        _throw[ #_throw + 1 ]  = 47 + 41 -- makoto:������K + �哂��
+        _throw[ #_throw + 1 ]  = 39 + 41 -- makoto:立ち小K + 小唐草
+        _throw[ #_throw + 1 ]  = 43 + 41 -- makoto:立ち小K + 中唐草
+        _throw[ #_throw + 1 ]  = 47 + 41 -- makoto:立ち小K + 大唐草
       elseif(_p1.char_str == "q") then
-        _throw[ #_throw + 1 ]  = 24      -- q:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 24      -- q:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 24 + 14 -- q:����P
-        _throw[ #_throw + 1 ]  = 24 + 25 -- q:��P
-        _throw[ #_throw + 1 ]  = 24 + 36 -- q:4��P
+        _throw[ #_throw + 1 ]  = 24 + 14 -- q:屈中P
+        _throw[ #_throw + 1 ]  = 24 + 25 -- q:中P
+        _throw[ #_throw + 1 ]  = 24 + 36 -- q:4中P
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 85      -- q:���ߊl
-        _throw[ #_throw + 1 ]  = 87      -- q:���ߊl
-        _throw[ #_throw + 1 ]  = 89      -- q:��ߊl
+        _throw[ #_throw + 1 ]  = 85      -- q:小捕獲
+        _throw[ #_throw + 1 ]  = 87      -- q:中捕獲
+        _throw[ #_throw + 1 ]  = 89      -- q:大捕獲
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 103     -- q:����P + ��ߊl
-        _throw[ #_throw + 1 ]  = 114     -- q:��P   + ��ߊl
-        _throw[ #_throw + 1 ]  = 125     -- q:4��P  + ��ߊl
+        _throw[ #_throw + 1 ]  = 103     -- q:屈中P + 大捕獲
+        _throw[ #_throw + 1 ]  = 114     -- q:中P   + 大捕獲
+        _throw[ #_throw + 1 ]  = 125     -- q:4中P  + 大捕獲
       elseif(_p1.char_str == "twelve") then
-        _throw[ #_throw + 1 ]  = 22      -- twelve:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 22      -- twelve:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 22 + 20 -- twelve:����P
+        _throw[ #_throw + 1 ]  = 22 + 20 -- twelve:遠中P
       elseif(_p1.char_str == "remy") then
-        _throw[ #_throw + 1 ]  = 24      -- remy:�ʏ퓊��
+        _throw[ #_throw + 1 ]  = 24      -- remy:通常投げ
         _throw[ #_throw + 1 ]  = 0
-        _throw[ #_throw + 1 ]  = 24 + 14 -- remy:�ߒ�P
-        _throw[ #_throw + 1 ]  = 24 + 16 -- remy:6��K
-        _throw[ #_throw + 1 ]  = 24 + 21 -- remy:����P
-        _throw[ #_throw + 1 ]  = 24 + 27 -- remy:����K
+        _throw[ #_throw + 1 ]  = 24 + 14 -- remy:近中P
+        _throw[ #_throw + 1 ]  = 24 + 16 -- remy:6中K
+        _throw[ #_throw + 1 ]  = 24 + 21 -- remy:遠中P
+        _throw[ #_throw + 1 ]  = 24 + 27 -- remy:遠大K
       end
 
       local _distance = math.abs(P1_px - P2_px)
@@ -3328,7 +3328,7 @@ function on_gui()
             local _px
             local _py
             local _hy
-            -- �v���C���[�̈ʒu
+            -- プレイヤーの位置
             if( _p1.id == 1 ) then
               _px = P1_px
               _py = P1_py
@@ -3345,10 +3345,10 @@ function on_gui()
               _color = 0xFF0000CC
             end
 
-            -- �E����
+            -- 右向き
             if(_p1.flip_x == 1) then
               draw_horizontal_line(_px + _p1_push_width + 1,           _px + _p1_push_width + _throw[ i ], _py+i-_hy, _color, 1)
-            -- ������
+            -- 左向き
             else
               draw_horizontal_line(_px - _p1_push_width - _throw[ i ], _px - _p1_push_width - 1,           _py+i-_hy, _color, 1)
             end
@@ -3434,7 +3434,7 @@ function on_gui()
     end
   end -- is_in_match
 
-  -- ���j���[�\��
+  -- メニュー表示
   if is_menu_open then
     local _horizontal_autofire_rate = 4
     local _vertical_autofire_rate = 4
