@@ -419,8 +419,9 @@ blocking_mode =
 {
   "never",
   "always",
-  "first hit",
+  "first hit only",
   "random",
+  "after first hit",
 }
 
 tech_throws_mode =
@@ -807,6 +808,7 @@ end
 function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_count)
 
   local _debug = false
+  local auto_block_frame_count = 90
 
   -- ensure variables
   _dummy.blocking.blocked_hit_count = _dummy.blocking.blocked_hit_count or 0
@@ -815,6 +817,7 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
   _dummy.blocking.last_attack_hit_id = _dummy.blocking.last_attack_hit_id or 0
   _dummy.blocking.is_bypassing_freeze_frames = _dummy.blocking.is_bypassing_freeze_frames or false
   _dummy.blocking.bypassed_freeze_frames = _dummy.blocking.bypassed_freeze_frames or 0
+  _dummy.blocking.auto_block_frames = _dummy.blocking.auto_block_frames or auto_block_frame_count
 
   function stop_listening_hits(_player_obj)
     _dummy.blocking.listening = false
@@ -920,6 +923,18 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
     stop_listening_hits(_dummy)
     stop_listening_projectiles(_dummy)
     return
+  end
+
+  if _mode == 5 then -- after first hit
+    _dummy.blocking.auto_block_frames = math.max(_dummy.blocking.auto_block_frames - 1, 0)
+  
+    if (_dummy.has_just_blocked) then
+    _dummy.blocking.auto_block_frames = auto_block_frame_count
+    end
+
+    if (_dummy.has_just_been_hit) then
+    _dummy.blocking.auto_block_frames = auto_block_frame_count
+    end
   end
 
   function get_meta_hit(_character_str, _move_id, _hit_id)
@@ -1065,6 +1080,12 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
                   end
                 end
               end
+            elseif _mode == 5 then -- after first hit
+              if _dummy.blocking.auto_block_frames > 0 then
+                _dummy.blocking.should_block = true
+              else
+                _dummy.blocking.should_block = false
+              end
             end
 
             if _debug then
@@ -1152,6 +1173,12 @@ function update_blocking(_input, _player, _dummy, _mode, _style, _red_parry_hit_
                     print(string.format(" %d: next hit randomized out", frame_number))
                   end
                 end
+              end
+            elseif _mode == 5 then -- after first hit
+              if _dummy.blocking.auto_block_frames > 0 then
+                _dummy.blocking.should_block = true
+              else
+                _dummy.blocking.should_block = false
               end
             end
 
